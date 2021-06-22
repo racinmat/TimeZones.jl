@@ -1,4 +1,10 @@
 using ...TimeZones: Class
+if VERSION >= v"1.3"
+    # Artifacts introduced in Pkg v1.3
+    # Using Pkg instead of using LazyArtifacts is deprecated on 1.6.0-beta1.15 and 1.7.0-DEV.302
+    # LazyArtifacts.jl available for v1.3 and up
+    using LazyArtifacts
+end
 
 # The default tz source files we care about. See "ftp://ftp.iana.org/tz/data/Makefile"
 # "PRIMARY_YDATA" for listing of tz source files to include.
@@ -28,47 +34,47 @@ function build(
     compiled_dir::AbstractString="";
     verbose::Bool=false,
 )
-    # Avoids spamming remote servers requesting the latest version
-    if version == "latest"
-        v = latest_version()
-
-        if v !== nothing
-            version = v
-            @info "Latest tzdata is $version"
-        end
-    end
-
-    @static if VERSION >= v"1.4"
-        now_utc = now(Dates.UTC)
-        # todo: I don't have latest here and it should not be used as latest
+    @static if VERSION >= v"1.3"
+        # Determine the current "latest" version but limit how often we check with remote
+        # servers.
         if version == "latest"
-            m = match(TZDATA_VERSION_REGEX, "tzdata$version.tar.gz")
-            if m !== nothing
-                version = m.match
-                @info "Latest tzdata is $version"
-                artifact_dir = @artifact_str "tzdata$version"
-                version = tzdata_version_dir(artifact_dir)
-                set_latest(version, now_utc)
-            else
-                archive = tzdata_download(version, archive_dir)
-                if !isempty(tz_source_dir)
-                    @info "Extracting $version tzdata archive"
-                    extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
+            latest_version = latest_cached()
+
+            # Retrieve the current latest version the cached latest has expired
+            if latest_version === nothing
+                latest_version = last(tzdata_versions())
+                tzdata_hash = artifact_hash("tzdata$latest_version", ARTIFACT_TOML)
+
+                if tzdata_hash === nothing
+                    error("Latest tzdata is $latest_version which is not present in the Artifacts.toml")
                 end
+
+                set_latest_cached(latest_version)
             end
+
+            version = latest_version
         end
 
-        if version != "latest"
-            artifact_dir = @artifact_str "tzdata$version"
+        artifact_dir = @artifact_str "tzdata$version"
 
-            if !isempty(tz_source_dir)
-                @info "Copying region data from version $version"
-                for region in setdiff(regions, CUSTOM_REGIONS)
-                    cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
-                end
+        if !isempty(tz_source_dir)
+            @info "Installing $version tzdata region data"
+            regions = union!(intersect(regions, readdir(artifact_dir)), CUSTOM_REGIONS)
+            for region in setdiff(regions, CUSTOM_REGIONS)
+                cp(joinpath(artifact_dir, region), joinpath(tz_source_dir, region), force=true)
             end
         end
     else
+        # Avoids spamming remote servers requesting the latest version
+        if version == "latest"
+            v = latest_cached()
+
+            if v !== nothing
+                version = v
+                @info "Latest tzdata is $version"
+            end
+        end
+
         archive = joinpath(archive_dir, "tzdata$version.tar.gz")
 
         # Avoid downloading a tzdata archive if we already have a local copy
@@ -87,6 +93,7 @@ function build(
 
         if !isempty(tz_source_dir)
             @info "Extracting $version tzdata archive"
+            regions = union!(intersect(regions, readarchive(archive)), CUSTOM_REGIONS)
             extract(archive, tz_source_dir, setdiff(regions, CUSTOM_REGIONS), verbose=verbose)
         end
     end
@@ -101,11 +108,9 @@ function build(
 end
 
 function build(version::AbstractString=tzdata_version())
-    if VERSION < v"1.4"
-        isdir(ARCHIVE_DIR) || mkdir(ARCHIVE_DIR)
-    end
-    isdir(TZ_SOURCE_DIR) || mkdir(TZ_SOURCE_DIR)
-    isdir(COMPILED_DIR) || mkdir(COMPILED_DIR)
+    isdir(ARCHIVE_DIR) || mkpath(ARCHIVE_DIR)
+    isdir(TZ_SOURCE_DIR) || mkpath(TZ_SOURCE_DIR)
+    isdir(COMPILED_DIR) || mkpath(COMPILED_DIR)
 
     # Empty the compile directory in case to handle different versions not overriding all
     # files.

@@ -9,12 +9,13 @@ deps/compiled
 deps/local
 !deps/local/windowsZones.xml
 deps/active_version
+deps/latest
 test/tzsource
 docs/build
 
 # PkgBenchmark
-benchmark/.results
-benchmark/.tune.jld
+benchmark/Manifest.toml
+benchmark/tune.json
 
 # Pkg
 deps/build.log

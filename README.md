@@ -1,7 +1,7 @@
 TimeZones.jl
 ============
 
-[![Travis CI](https://travis-ci.com/JuliaTime/TimeZones.jl.svg?branch=master)](https://travis-ci.com/JuliaTime/TimeZones.jl)
+[![CI](https://github.com/JuliaTime/TimeZones.jl/workflows/CI/badge.svg)](https://github.com/JuliaTime/TimeZones.jl/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/JuliaTime/TimeZones.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaTime/TimeZones.jl)
 <br/>
 [![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliatime.github.io/TimeZones.jl/stable)
@@ -9,7 +9,7 @@ TimeZones.jl
 <br/>
 [![code style blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 
-[IANA time zone database](http://www.iana.org/time-zones) access for the [Julia](http://julialang.org/) programming language. TimeZones.jl extends the Date/DateTime support for Julia to include a new time zone aware TimeType: ZonedDateTime.
+[IANA time zone database](https://www.iana.org/time-zones) access for the [Julia](https://julialang.org) programming language. TimeZones.jl extends the Date/DateTime support for Julia to include a new time zone aware TimeType: ZonedDateTime.
 
 ## Features
 
@@ -18,7 +18,7 @@ TimeZones.jl
 * ZonedDateTime-Period arithmetic [similar to that of DateTime](https://docs.julialang.org/en/stable/manual/dates/#TimeType-Period-Arithmetic-1)
 * Local system time zone information as a TimeZone
 * Current system time in any TimeZone
-* Support for reading the [tzfile](http://man7.org/linux/man-pages/man5/tzfile.5.html) format
+* Support for reading the [tzfile](https://man7.org/linux/man-pages/man5/tzfile.5.html) format
 * String parsing of ZonedDateTime using [DateFormat](https://docs.julialang.org/en/stable/stdlib/dates/#Base.Dates.DateFormat)
 
 ## Installation

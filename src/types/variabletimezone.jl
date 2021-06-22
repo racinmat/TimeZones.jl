@@ -3,7 +3,7 @@ struct Transition
     zone::FixedTimeZone
 end
 
-Base.isless(x::Transition,y::Transition) = isless(x.utc_datetime,y.utc_datetime)
+Base.isless(a::Transition, b::Transition) = isless(a.utc_datetime, b.utc_datetime)
 
 """
     VariableTimeZone
@@ -39,8 +39,7 @@ function Base.isequal(a::VariableTimeZone, b::VariableTimeZone)
 end
 
 function Base.hash(tz::VariableTimeZone, h::UInt)
+    h = hash(:timezone, h)
     h = hash(tz.name, h)
-    h = hash(tz.transitions, h)
-    h = hash(tz.cutoff, h)
     return h
 end

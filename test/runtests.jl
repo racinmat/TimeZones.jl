@@ -44,6 +44,8 @@ include("helpers.jl")
 
 @testset "TimeZones" begin
     include("utils.jl")
+    include("indexable_generator.jl")
+
     include("class.jl")
     include(joinpath("tzdata", "timeoffset.jl"))
     VERSION < v"1.4" && include(joinpath("tzdata", "archive.jl"))

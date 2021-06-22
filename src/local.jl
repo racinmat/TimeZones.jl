@@ -21,7 +21,7 @@ function localzone()
         name = ""
 
         # Try getting the time zone from the "TZ" environment variable
-        # http://linux.die.net/man/3/tzset
+        # https://linux.die.net/man/3/tzset
         #
         # Note: The macOS man page tzset(3) states some additional information about the
         # colon being optional:
@@ -175,7 +175,7 @@ end
 
 Parse the time zone format typically provided via the "TZ" environment variable. Details on
 the format can be found under the man page for
-[tzset](http://man7.org/linux/man-pages/man3/tzset.3.html).
+[tzset](https://man7.org/linux/man-pages/man3/tzset.3.html).
 """
 function parse_tz_format(str::AbstractString)
     x = _parsesub_tz(str)

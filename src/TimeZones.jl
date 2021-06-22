@@ -30,8 +30,12 @@ export TimeZone, @tz_str, istimezone, FixedTimeZone, VariableTimeZone, ZonedDate
     # ranges.jl
     guess
 
-const PKG_DIR = normpath(joinpath(dirname(@__FILE__), ".."))
+const PKG_DIR = dirname(@__DIR__)
 const DEPS_DIR = joinpath(PKG_DIR, "deps")
+
+# TimeZone types used to disambiguate the context of a DateTime
+# abstract type UTC <: TimeZone end  # Already defined in the Dates stdlib
+abstract type Local <: TimeZone end
 
 function __init__()
     # Base extension needs to happen everytime the module is loaded (issue #24)
@@ -45,7 +49,10 @@ function __init__()
     global ISOZonedDateTimeFormat = DateFormat("yyyy-mm-ddTHH:MM:SS.ssszzz")
 end
 
+include("compat.jl")
 include("utils.jl")
+include("indexable_generator.jl")
+
 include("class.jl")
 include("utcoffset.jl")
 include(joinpath("types", "timezone.jl"))
